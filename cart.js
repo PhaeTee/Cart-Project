@@ -312,3 +312,9 @@ function newOrder(){
 // closeCart.addEventListener("click", ()=>{
 //     body.classList.toggle("showCart")
 // })
+
+// tailwind modal component
+// tailwimd plus eelement, dialog
+// tailwindcss.com
+// cdand tailwind css plus
+// copy sciot from both and tailwind css plus
