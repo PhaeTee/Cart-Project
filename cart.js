@@ -53,7 +53,7 @@ const displayItems = () =>{
                 `
                 : `
                 <button id="addItem-btn" onclick="addItem('${item.name}')">
-                <img src="/product-list-with-cart-main/assets/images/icon-add-to-cart.svg" alt="cart icon">
+                <img src="assets/images/icon-add-to-cart.svg" alt="cart icon">
                 <span>Add to Cart</span></button>
                   `
         }
@@ -183,7 +183,7 @@ const displayCart = () =>{
 
                 <button class="remove-btn" onclick="removeItem('${item.name}')"> 
 
-                    <img src="/product-list-with-cart-main/assets/images/icon-remove-item.svg" alt="">
+                    <img src="assets/images/icon-remove-item.svg" alt="">
                 </button>
 
             </div>
@@ -212,7 +212,7 @@ const displayCart = () =>{
             </div>
 
             <div class="delivery">
-                <img class="delivery-img" width="20px" height="20px" src="/product-list-with-cart-main/assets/images/icon-carbon-neutral.svg" alt="">
+                <img class="delivery-img" width="20px" height="20px" src="assets/images/icon-carbon-neutral.svg" alt="">
                 <p>This is a <span>carbon-neutral</span> delivery</p>
             </div>
 
@@ -225,7 +225,7 @@ const displayCart = () =>{
         `;
     } else{
         cartDiv.innerHTML = `<div class="empty-cart"> 
-            <img src="/product-list-with-cart-main/assets/images/illustration-empty-cart.svg" alt="">
+            <img src="assets/images/illustration-empty-cart.svg" alt="">
             <p>Your added items will appear here</p>
         </div>`
 
