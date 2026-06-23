@@ -1,49 +1,43 @@
 const productList = document.getElementById("product-list");
 const cartDiv = document.getElementById("cart-div");
-const orderDiv = document.querySelector(".order-review")
-const cartCount = document.querySelector("#cart-count")
-
+const orderDiv = document.querySelector(".order-review");
+const cartCount = document.querySelector("#cart-count");
 
 let productArray = [];
 let cartArray = JSON.parse(localStorage.getItem("cart")) || [];
 
+async function getList() {
+  try {
+    const data = await fetch("data.json");
+    let productData = await data.json();
 
-async function getList(){
-    try{
-        const data = await fetch("data.json")
-        let productData = await data.json();
+    productArray = productData;
 
-        productArray = productData
+    localStorage.setItem("items", JSON.stringify(productData));
 
-        localStorage.setItem("items",JSON.stringify(productData))
+    displayItems();
 
-        displayItems()
-
-        console.log(productData);
-    }
-    catch(err){
-        "unable to fetch data";
-    }
+    console.log(productData);
+  } catch (err) {
+    ("unable to fetch data");
+  }
 }
-getList()
+getList();
 
+const displayItems = () => {
+  productList.innerHTML = "";
 
+  productArray.forEach((item) => {
+    let cartItem = cartArray.find((cart) => cart.name === item.name);
 
-const displayItems = () =>{
-    productList.innerHTML = "";
-
-    productArray.forEach((item)=>{
-
-        let cartItem = cartArray.find(cart => cart.name === item.name);
-
-        productList.innerHTML += `<div class="productList">
+    productList.innerHTML += `<div class="productList">
         
         <div class="product-img-btn">
         <img class="product-image" src="${item.image.desktop}" alt="${item.name}"/>
         
 
         ${
-            cartItem
+          cartItem
             ? `
                 <div class="qty-btn">
                 <button onclick="decreaseQty('${item.name}')">-</button>
@@ -51,7 +45,7 @@ const displayItems = () =>{
                 <button onclick="increaseQty('${item.name}')">+</button>
                 </div>
                 `
-                : `
+            : `
                 <button id="addItem-btn" onclick="addItem('${item.name}')">
                 <img src="assets/images/icon-add-to-cart.svg" alt="cart icon">
                 <span>Add to Cart</span></button>
@@ -67,115 +61,101 @@ const displayItems = () =>{
         </div>
         
         </div>`;
-    })
- console.log(productArray)
- 
- displayCart()
- totalCartCount()
-}
+  });
+  console.log(productArray);
 
+  displayCart();
+  totalCartCount();
+};
 
-function addItem(name){
+function addItem(name) {
+  // let newItem = productArray[index];
 
-    // let newItem = productArray[index];
+  let product = productArray.find((product) => product.name === name);
 
-    let product = productArray.find(product => product.name === name)
+  let cartItem = cartArray.find((cart) => cart.name === name);
 
-    let cartItem = cartArray.find(cart => cart.name === name);
+  if (!cartItem) {
+    cartArray.push({
+      ...product,
+      quantity: 1,
+    });
+  } else {
+    cartItem.quantity++;
+  }
 
-    if (!cartItem) {
-        cartArray.push({
+  localStorage.setItem("cart", JSON.stringify(cartArray));
+  totalCartCount();
+  displayItems();
 
-            ...product,
-            quantity: 1
-        });
-        
-    } else {
-        cartItem.quantity ++;
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cartArray))
-    totalCartCount()
-    displayItems()
-    
-    displayCart();
-    console.log(cartArray);
-
+  displayCart();
+  console.log(cartArray);
 }
 
 function increaseQty(name) {
+  let item = cartArray.find((cart) => cart.name === name);
 
-    let item = cartArray.find(cart => cart.name === name);
+  if (item) {
+    item.quantity++;
+  }
 
-    if (item) {
-        item.quantity ++;
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cartArray))
-    totalCartCount()
-    displayItems();
-    displayCart()
-    
+  localStorage.setItem("cart", JSON.stringify(cartArray));
+  totalCartCount();
+  displayItems();
+  displayCart();
 }
 
 function decreaseQty(name) {
+  let index = cartArray.findIndex((cart) => cart.name === name);
 
-    let index = cartArray.findIndex(cart => cart.name === name);
+  if (index !== -1) {
+    cartArray[index].quantity--;
 
-    if (index !== -1) {
-        cartArray[index].quantity --;
-
-        if (cartArray[index].quantity <= 0) {
-            cartArray.splice(index, 1);
-        }
+    if (cartArray[index].quantity <= 0) {
+      cartArray.splice(index, 1);
     }
+  }
 
-    localStorage.setItem("cart", JSON.stringify(cartArray))
-    totalCartCount()
-    displayItems();
-    displayCart()
-    
+  localStorage.setItem("cart", JSON.stringify(cartArray));
+  totalCartCount();
+  displayItems();
+  displayCart();
 }
 
-function removeItem(name){
+function removeItem(name) {
+  cartArray = cartArray.filter((item) => item.name !== name);
 
-    cartArray = cartArray.filter(item => item.name !== name);
+  localStorage.setItem("cart", JSON.stringify(cartArray));
+  totalCartCount();
+  displayItems();
+  displayCart();
 
-    localStorage.setItem("cart", JSON.stringify(cartArray))
-    totalCartCount()
-    displayItems()
-    displayCart()
-
-    console.log(cartArray)
+  console.log(cartArray);
 }
 
 function totalCartCount() {
-    const totalQty = cartArray.reduce((total, item) => {
-        return total + item.quantity;
-    }, 0);
+  const totalQty = cartArray.reduce((total, item) => {
+    return total + item.quantity;
+  }, 0);
 
-    cartCount.innerHTML= `(${totalQty})`
+  cartCount.innerHTML = `(${totalQty})`;
 
-    console.log(totalQty )
+  console.log(totalQty);
 }
 
+const displayCart = () => {
+  cartDiv.innerHTML = "";
 
-const displayCart = () =>{
-    cartDiv.innerHTML = "";
+  let orderTotal = 0;
 
+  for (let index = 0; index < cartArray.length; index++) {
+    const item = cartArray[index];
 
+    const itemTotal = item.price * item.quantity;
 
-    let orderTotal = 0
+    orderTotal += itemTotal;
 
-    for(let index = 0; index < cartArray.length; index++){
-        
-        const item = cartArray[index];
-
-        const itemTotal = item.price * item.quantity
-
-        orderTotal += itemTotal
-
-        cartDiv.innerHTML += `
+    cartDiv.innerHTML += `
         <div class="cart-item">
             <div class="cart-item-head">
         
@@ -199,11 +179,10 @@ const displayCart = () =>{
             <hr>
         
         </div>`;
+  }
 
-    }
-
-    if (cartArray.length > 0) {
-        cartDiv.innerHTML += `
+  if (cartArray.length > 0) {
+    cartDiv.innerHTML += `
         <div class="order-summary">
 
             <div class="order-total">
@@ -223,28 +202,26 @@ const displayCart = () =>{
 
         </div>
         `;
-    } else{
-        cartDiv.innerHTML = `<div class="empty-cart"> 
+  } else {
+    cartDiv.innerHTML = `<div class="empty-cart"> 
             <img src="assets/images/illustration-empty-cart.svg" alt="">
             <p>Your added items will appear here</p>
-        </div>`
+        </div>`;
+  }
+};
 
-    }
-}
+const reviewOrder = () => {
+  const order = JSON.parse(localStorage.getItem("cart"));
 
-const reviewOrder = () =>{
+  orderDiv.innerHTML = "";
 
-    const order = JSON.parse(localStorage.getItem("cart"))
+  let total = 0;
 
-    orderDiv.innerHTML = "";
+  order.forEach((item) => {
+    const itemTotal = item.price * item.quantity;
+    total += itemTotal;
 
-    let total = 0;
-
-    order.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-
-        orderDiv.innerHTML += `
+    orderDiv.innerHTML += `
             <div class="review-section">
 
                 
@@ -267,33 +244,26 @@ const reviewOrder = () =>{
             <hr>  
 
         `;
-    });
+  });
 
-    orderDiv.innerHTML +=`
+  orderDiv.innerHTML += `
      <div class="review-total">
                     <p>Order Total</p>
                     <strong>$${total.toFixed(2)}</strong>
-                </div>`
+                </div>`;
+};
+
+function newOrder() {
+  cartArray = [];
+  localStorage.removeItem("cart");
+  totalCartCount();
+  displayItems();
+  displayCart();
 }
-
-function newOrder(){
-    cartArray=[]
-    localStorage.removeItem("cart")
-    totalCartCount()
-    displayItems();
-    displayCart()
-
-}
-
-
-
-
-
-
 
 // for (let index = 0; index < array.length; index++) {
 //     const element = array[index];
-    
+
 // }
 // const displayCart = () =>{
 
